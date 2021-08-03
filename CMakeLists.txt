@@ -16,6 +16,12 @@ add_executable(sand
 		${PHIL_SRC}
 		)
 
+add_executable(main
+		main.c
+		headers/philo.h
+		${PHIL_SRC}
+		)
+
 target_link_libraries(
 		sand
 		libft
