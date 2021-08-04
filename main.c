@@ -3,6 +3,7 @@
 void str_error(char *str)
 {
 	ft_putstr_fd(str, 1);
+//	free
 }
 
 int	is_num(char **argv)
@@ -19,8 +20,8 @@ int	is_num(char **argv)
 	}
 	return (1);
 }
-
-int	parse_args(int argc, char **argv)
+void parse_table(t_philo *, char **argv)
+int	parse(int argc, char **argv, t_table *table, t_philo *philo)
 {
 	int i;
 
@@ -30,13 +31,24 @@ int	parse_args(int argc, char **argv)
 		return (0);
 	while (i++ < argc)
 		printf("%s\n", argv[i]);
-	return (0);
+	table->philos = ft_atoi(argv[1]);
+	table->die = ft_atoi(argv[2]);
+	table->eat = ft_atoi(argv[3]);
+	table->eat = ft_atoi(argv[3]);
+
+
+
+
+	return (1);
 }
 int main(int argc, char **argv)
 {
+	t_table table;
+	t_philo philo;
+
 	if (argc < 5 || argc > 6)
 		str_error("Error arguments\n");
-	if (!(parse_args(argc, argv)))
+	if (!(parse(argc, argv, &table, &philo)))
 		str_error("Error arguments\n");
 	return 0;
 }

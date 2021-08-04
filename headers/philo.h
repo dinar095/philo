@@ -2,7 +2,7 @@
 # define PHILO_H
 # include <stdio.h>
 # include <unistd.h>
-# include "../libft/libft.h"
+#include <pthread.h>
 typedef struct	s_start
 {
 	int num_of_philo;
@@ -15,8 +15,25 @@ typedef struct	s_start
 	
 }				t_start;
 
-typedef struct 	s_philo
+typedef struct		s_philo
 {
+	const char		*name;
+	unsigned int	left;
+	unsigned int	right;
+}					t_philo;
 
-}				t_philo;
+typedef struct		s_table
+{
+	pthread_mutex_t	*forks;
+	unsigned int	philos;
+	unsigned int 	die;
+	unsigned int	eat;
+	unsigned int	sleep;
+	unsigned int 	et_conunt;
+
+}					t_table;
+
+unsigned int		ft_atoi(const char *str);
+int					ft_isdigit(int ch);
+void				ft_putstr_fd(char *s, int fd);
 #endif

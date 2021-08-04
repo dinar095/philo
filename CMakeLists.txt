@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(philo C)
 FILE(GLOB PHIL_SRC
-		${CMAKE_CURRENT_SOURCE_DIR}/libft/*.h
-		${CMAKE_CURRENT_SOURCE_DIR}/libft/*.c)
+		${CMAKE_CURRENT_SOURCE_DIR}/srcs/*.c)
 set(CMAKE_C_STANDARD 99)
 
 SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
