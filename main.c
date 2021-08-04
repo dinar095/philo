@@ -20,7 +20,20 @@ int	is_num(char **argv)
 	}
 	return (1);
 }
-void parse_table(t_philo *, char **argv)
+
+void init_table(t_table *table, char **argv)
+{
+	table->philos = ft_atoi(argv[1]);
+	table->die = ft_atoi(argv[2]);
+	table->eat = ft_atoi(argv[3]);
+	table->sleep = ft_atoi(argv[4]);
+	if (argv[4])
+		table->et_conunt = ft_atoi(argv[5]);
+	else
+		table->et_conunt = -1;
+	table->forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * table->philos);
+}
+
 int	parse(int argc, char **argv, t_table *table, t_philo *philo)
 {
 	int i;
@@ -31,10 +44,8 @@ int	parse(int argc, char **argv, t_table *table, t_philo *philo)
 		return (0);
 	while (i++ < argc)
 		printf("%s\n", argv[i]);
-	table->philos = ft_atoi(argv[1]);
-	table->die = ft_atoi(argv[2]);
-	table->eat = ft_atoi(argv[3]);
-	table->eat = ft_atoi(argv[3]);
+	init_table(&table, argv);
+
 
 
 

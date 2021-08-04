@@ -2,7 +2,8 @@
 # define PHILO_H
 # include <stdio.h>
 # include <unistd.h>
-#include <pthread.h>
+# include <pthread.h>
+# include <stdlib.h>
 typedef struct	s_start
 {
 	int num_of_philo;
@@ -17,7 +18,7 @@ typedef struct	s_start
 
 typedef struct		s_philo
 {
-	const char		*name;
+	unsigned int 	id;
 	unsigned int	left;
 	unsigned int	right;
 }					t_philo;
