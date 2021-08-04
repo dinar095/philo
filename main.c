@@ -34,7 +34,7 @@ void init_table(t_table *table, char **argv)
 	table->forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * table->philos);
 }
 
-int	parse(int argc, char **argv, t_table *table, t_philo *philo)
+int	parse(int argc, char **argv, t_table *table)
 {
 	int i;
 
@@ -44,22 +44,34 @@ int	parse(int argc, char **argv, t_table *table, t_philo *philo)
 		return (0);
 	while (i++ < argc)
 		printf("%s\n", argv[i]);
-	init_table(&table, argv);
-
-
-
-
-
+	init_table(table, argv);
 	return (1);
 }
+void init_philos(t_table *table, t_philo *philo)
+{
+	int i;
+	int j;
+
+	i = -1;
+	j = 1;
+	philo = (t_philo *)malloc(sizeof(t_philo) * table->philos);
+	while (++i < table->philos)
+	{
+		philo[i].id = j++;
+		philo[i]//TODO
+
+	}
+}
+
 int main(int argc, char **argv)
 {
 	t_table table;
-	t_philo philo;
+	t_philo *philo;
 
 	if (argc < 5 || argc > 6)
-		str_error("Error arguments\n");
-	if (!(parse(argc, argv, &table, &philo)))
-		str_error("Error arguments\n");
+		str_error("Error arguments\n"); //add return
+	if (!(parse(argc, argv, &table)))
+		str_error("Error arguments\n"); //add return
+	init_philos(&table, philo);
 	return 0;
 }
