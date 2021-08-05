@@ -34,6 +34,12 @@ typedef struct		s_table
 
 }					t_table;
 
+typedef struct	s_all
+{
+	t_philo *philo;
+	t_table *table;
+}				t_all;
+
 unsigned int		ft_atoi(const char *str);
 int					ft_isdigit(int ch);
 void				ft_putstr_fd(char *s, int fd);
