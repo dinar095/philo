@@ -58,7 +58,7 @@ void init_philos(t_table *table, t_philo *philo)
 	while (++i < table->philos)
 	{
 		philo[i].id = j++;
-		philo[i]//TODO
+//		philo[i]//TODO
 
 	}
 }
