@@ -52,6 +52,15 @@ int	parse(int argc, char **argv, t_table *table)
 	init_table(table, argv);
 	return (1);
 }
+
+uint64_t	get_time(void)
+{
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	return ((((long long) tv.tv_sec) * 1000) + (tv.tv_usec / 1000));
+}
+
 void init_philos(t_table *table, t_philo **philo, t_all **all)
 {
 	int i;
@@ -87,6 +96,18 @@ void init_philos(t_table *table, t_philo **philo, t_all **all)
 
 }
 
+void	lock_fork(t_all *all)
+{
+	pthread_mutex_lock(&all->table->forks[all->philo->left]);
+	pthread_mutex_lock(&all->table->forks[all->philo->right]);
+}
+
+void 	unlock_fork(t_table *table, t_philo *philo)
+{
+	pthread_mutex_unlock(&table->forks[philo->left]);
+	pthread_mutex_unlock(&table->forks[philo->right]);
+}
+
 void *eat(void *alls)
 {
 	t_table *table;
@@ -97,15 +118,21 @@ void *eat(void *alls)
 	table = all->table;
 	philo = all->philo;
 	printf("philo %d started\n", philo->id);
-	pthread_mutex_lock(&table->forks[philo->left]);
-	usleep(500000);
-	pthread_mutex_lock(&table->forks[philo->right]);
-	printf("philo %d is eat\n", philo->id);
-	printf("left h: %d\nright h: %d\n", philo->left, philo->right);
-	pthread_mutex_unlock(&table->forks[philo->left]);
-	pthread_mutex_unlock(&table->forks[philo->right]);
+	lock_fork(all);
+	print_proc(all, 1, table->eat);
+	unlock_fork(table, philo);
 	printf("philo %d is stop\n", philo->id);
+}
 
+void print_proc(t_all *alls, int flag, unsigned int time)
+{
+	alls->philo->cur_time = get_time() - alls->table->start;
+	if (flag == 0)
+		printf("%llu %d has taken a fork\n", alls->philo->cur_time, alls->philo->id);
+	if (flag == 1)
+		printf("%llu %d is eating\n", alls->philo->cur_time, alls->philo->id);
+	if (time)
+		usleep(time * 1000);
 }
 
 int main(int argc, char **argv)
@@ -114,7 +141,6 @@ int main(int argc, char **argv)
 	t_philo		*philo;
 	t_all		*all;
 	pthread_t	*threads;
-
 	int 	i;
 
 	i = -1;
@@ -124,9 +150,14 @@ int main(int argc, char **argv)
 		str_error("Error arguments\n"); //add return
 	init_philos(&table, &philo, &all);
 	threads = (pthread_t *)malloc(sizeof(pthread_t) * table.philos);
+	table.start = get_time();
 	while (++i < table.philos)
 		pthread_create(&threads[i], NULL, eat, &all[i]);
 	while (--i)
 		pthread_join(threads[i], NULL);
+	//destroy mutex----------
+	while (++i < table.philos)
+		pthread_mutex_init(&table.forks[i], NULL);
+	//-----------------------
 	return 0;
 }
