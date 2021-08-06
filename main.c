@@ -107,7 +107,14 @@ void 	unlock_fork(t_table *table, t_philo *philo)
 	pthread_mutex_unlock(&table->forks[philo->left]);
 	pthread_mutex_unlock(&table->forks[philo->right]);
 }
+void my_usleep(unsigned int time)
+{
+	long long count;
 
+	count = get_time() + (long long)time;
+	while (get_time() < count)
+		usleep(50);
+}
 void *eat(void *alls)
 {
 	t_table *table;
@@ -132,7 +139,7 @@ void print_proc(t_all *alls, int flag, unsigned int time)
 	if (flag == 1)
 		printf("%llu %d is eating\n", alls->philo->cur_time, alls->philo->id);
 	if (time)
-		usleep(time * 1000);
+		my_usleep(time * 1000);
 }
 
 int main(int argc, char **argv)
