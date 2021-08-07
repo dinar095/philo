@@ -41,14 +41,8 @@ void init_table(t_table *table, char **argv)
 
 int	parse(int argc, char **argv, t_table *table)
 {
-	int i;
-
-	i = 0;
-
 	if (!(is_num(argv)))
 		return (0);
-//	while (i++ < argc-1)
-//		printf("%s\n", argv[i]);
 	init_table(table, argv);
 	return (1);
 }
@@ -84,16 +78,6 @@ void init_philos(t_table *table, t_philo **philo, t_all **all)
 		(*all)[i].philo = &(*philo)[i];
 		(*all)[i].table = table;
 	}
-//	i = -1;
-//	while(++i < table->philos)
-//	{
-//		printf("===========");
-//		printf("philo id: %d\n", philo[i].id);
-//		printf("philo left	f: %d\n", philo[i].left);
-//		printf("philo rigth	f: %d\n", philo[i].right);
-//		printf("===========");
-//	}
-
 }
 
 void	lock_fork(t_all *all)
@@ -113,7 +97,7 @@ void my_usleep(unsigned int time)
 
 	count = get_time() + (long long)time;
 	while (get_time() < count)
-		usleep(50);
+		usleep(500);
 }
 void *eat(void *alls)
 {
@@ -124,22 +108,28 @@ void *eat(void *alls)
 	all = (t_all *)alls;
 	table = all->table;
 	philo = all->philo;
-	printf("philo %d started\n", philo->id);
+	if(philo->id % 2)
+		usleep(5000);
+//
 	lock_fork(all);
 	print_proc(all, 1, table->eat);
 	unlock_fork(table, philo);
+//	update die time
+//	prinf sleep
+//	usleep for sleep
 	printf("philo %d is stop\n", philo->id);
 }
 
 void print_proc(t_all *alls, int flag, unsigned int time)
 {
 	alls->philo->cur_time = get_time() - alls->table->start;
+//	mutex for print
 	if (flag == 0)
 		printf("%llu %d has taken a fork\n", alls->philo->cur_time, alls->philo->id);
 	if (flag == 1)
 		printf("%llu %d is eating\n", alls->philo->cur_time, alls->philo->id);
 	if (time)
-		my_usleep(time * 1000);
+		my_usleep(time);
 }
 
 int main(int argc, char **argv)
@@ -160,6 +150,7 @@ int main(int argc, char **argv)
 	table.start = get_time();
 	while (++i < table.philos)
 		pthread_create(&threads[i], NULL, eat, &all[i]);
+	pthread_create()
 	while (--i)
 		pthread_join(threads[i], NULL);
 	//destroy mutex----------
