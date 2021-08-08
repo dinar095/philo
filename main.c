@@ -47,7 +47,7 @@ int	parse(int argc, char **argv, t_table *table)
 	return (1);
 }
 
-uint64_t	get_time(void)
+u_int64_t 	get_time(void)
 {
 	struct timeval	tv;
 
@@ -83,7 +83,9 @@ void init_philos(t_table *table, t_philo **philo, t_all **all)
 void	lock_fork(t_all *all)
 {
 	pthread_mutex_lock(&all->table->forks[all->philo->left]);
+	print_proc(all, 0, 0);
 	pthread_mutex_lock(&all->table->forks[all->philo->right]);
+	print_proc(all, 0, 0);
 }
 
 void 	unlock_fork(t_table *table, t_philo *philo)
@@ -104,6 +106,7 @@ void *eat(void *alls)
 	t_table *table;
 	t_philo	*philo;
 	t_all	*all;
+	long long count;
 
 	all = (t_all *)alls;
 	table = all->table;
@@ -114,7 +117,10 @@ void *eat(void *alls)
 	lock_fork(all);
 	print_proc(all, 1, table->eat);
 	unlock_fork(table, philo);
-//	update die time
+	philo->die = get_time() + table->die;//update philo die time
+	print_proc(all, 2, table->sleep);
+
+
 //	prinf sleep
 //	usleep for sleep
 	printf("philo %d is stop\n", philo->id);
@@ -128,6 +134,8 @@ void print_proc(t_all *alls, int flag, unsigned int time)
 		printf("%llu %d has taken a fork\n", alls->philo->cur_time, alls->philo->id);
 	if (flag == 1)
 		printf("%llu %d is eating\n", alls->philo->cur_time, alls->philo->id);
+	if (flag == 2)
+		printf("%llu %d is sleeping\n", alls->philo->cur_time, alls->philo->id);
 	if (time)
 		my_usleep(time);
 }
@@ -150,7 +158,7 @@ int main(int argc, char **argv)
 	table.start = get_time();
 	while (++i < table.philos)
 		pthread_create(&threads[i], NULL, eat, &all[i]);
-	pthread_create()
+//	pthread_createe();
 	while (--i)
 		pthread_join(threads[i], NULL);
 	//destroy mutex----------

@@ -5,6 +5,9 @@
 # include <pthread.h>
 # include <stdlib.h>
 # include <sys/time.h>
+
+
+
 typedef struct	s_start
 {
 	int num_of_philo;
@@ -19,9 +22,9 @@ typedef struct	s_start
 
 typedef struct		s_philo
 {
-	uint64_t 		eat;
-	uint64_t 		die;
-	uint64_t 		cur_time;
+	u_int64_t 		eat;
+	u_int64_t 		die;
+	u_int64_t 		cur_time;
 	unsigned int 	id;
 	unsigned int	left;
 	unsigned int	right;
@@ -36,7 +39,7 @@ typedef struct		s_table
 	unsigned int	sleep;
 	unsigned int 	et_conunt;
 	pthread_mutex_t print;
-	uint64_t 		start;
+	u_int64_t 		start;
 
 }					t_table;
 
@@ -49,6 +52,6 @@ typedef struct	s_all
 unsigned int		ft_atoi(const char *str);
 int					ft_isdigit(int ch);
 void				ft_putstr_fd(char *s, int fd);
-uint64_t			get_time(void);
+u_int64_t 			get_time(void);
 void				print_proc(t_all *alls, int flag, unsigned int time);
 #endif
