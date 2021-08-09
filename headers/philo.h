@@ -28,6 +28,7 @@ typedef struct		s_philo
 	unsigned int 	id;
 	unsigned int	left;
 	unsigned int	right;
+	unsigned int	must_eat;
 }					t_philo;
 
 typedef struct		s_table
@@ -38,6 +39,7 @@ typedef struct		s_table
 	unsigned int	eat;
 	unsigned int	sleep;
 	unsigned int 	et_conunt;
+	int 			stop;
 	pthread_mutex_t print;
 	u_int64_t 		start;
 
