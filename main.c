@@ -70,7 +70,7 @@ void init_philos(t_table *table, t_philo **philo, t_all **all)
 		(*philo)[i].id = j++;
 		(*philo)[i].right = i;
 		(*philo)[i].left = i + 1;
-		(*philo)[i].must_eat = table->et_conunt;
+		(*philo)[i].must_eat = 0;
 		(*philo)[i].die = get_time() + table->die;
 
 	}
@@ -127,7 +127,7 @@ void *eat(void *alls)
 		unlock_fork(table, philo);
 		print_proc(all, 2, table->sleep);
 		print_proc(all, 3, 0);
-		philo->must_eat--;
+		philo->must_eat++;
 	}
 }
 
@@ -172,6 +172,8 @@ void *check_philos(void *alls)
 				printf("%llu %d is died\n", philo->cur_time, philo->id);
 				table->stop = 1;
 			}
+			if (philo->must_eat == table->et_conunt)//TODO
+
 		}
 	}
 }
