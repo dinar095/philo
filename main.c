@@ -117,7 +117,7 @@ void *eat(void *alls)
 	table = all->table;
 	philo = all->philo;
 	if(philo->id % 2)
-		usleep(5000);
+		usleep(500);
 //
 	while (!table->stop)
 	{
@@ -134,17 +134,19 @@ void *eat(void *alls)
 void print_proc(t_all *alls, int flag, unsigned int time)
 {
 	alls->philo->cur_time = get_time() - alls->table->start;
-	if (alls->table->stop)
-	pthread_mutex_lock(&alls->table->print);
-	if (flag == 0)
-		printf("%llu %d has taken a fork\n", alls->philo->cur_time, alls->philo->id);
-	if (flag == 1)
-		printf("%llu %d is eating\n", alls->philo->cur_time, alls->philo->id);
-	if (flag == 2)
-		printf("%llu %d is sleeping\n", alls->philo->cur_time, alls->philo->id);
-	pthread_mutex_unlock(&alls->table->print);
-	if (time)
-		my_usleep(time);
+	if (!alls->table->stop)
+	{
+		pthread_mutex_lock(&alls->table->print);
+		if (flag == 0)
+			printf("%llu %d has taken a fork\n", alls->philo->cur_time, alls->philo->id);
+		if (flag == 1)
+			printf("%llu %d is eating\n", alls->philo->cur_time, alls->philo->id);
+		if (flag == 2)
+			printf("%llu %d is sleeping\n", alls->philo->cur_time, alls->philo->id);
+		pthread_mutex_unlock(&alls->table->print);
+		if (time)
+			my_usleep(time);
+	}
 
 }
 
