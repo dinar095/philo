@@ -23,7 +23,7 @@ int	is_num(char **argv)
 
 void init_table(t_table *table, char **argv)
 {
-	int i;
+	unsigned int i;
 
 	i = -1;
 	table->philos = ft_atoi(argv[1]);
@@ -90,15 +90,15 @@ void	lock_fork(t_all *all)
 	if (all->table->stop) {
 		return ;
 	}
-	if(all->philo->id == 1)
-	{
-		ft_putstr_fd("   \n", 1);
-		ft_putnbr_fd(all->philo->left, 1);
-		ft_putstr_fd("   HHHHHHHHHHHHHHHHHH\n", 1);
-	}
+//	if(all->philo->id == 1)
+//	{
+//		ft_putstr_fd("   \n", 1);
+//		ft_putnbr_fd(all->philo->left, 1);
+//		ft_putstr_fd("   HHHHHHHHHHHHHHHHHH\n", 1);
+//	}
 	pthread_mutex_lock(&all->table->forks[all->philo->left]);
-	if(all->philo->id == 1)
-		printf("\n/////////////////\n");
+//	if(all->philo->id == 1)
+//		printf("\n/////////////////\n");
 	if (all->table->stop)
 		return ;
 	print_proc(all, "has taken a fork\n", 0);
@@ -139,8 +139,8 @@ void *eat(void *alls)
 	while (!table->stop)
 	{
 		lock_fork(all);
-		if (philo->id == 1)
-			printf("left %d rigth : %d\n", philo->left, philo->right);
+//		if (philo->id == 1)
+//			printf("left %d rigth : %d\n", philo->left, philo->right);
 		philo->die = get_time() + table->die;//update philo die time
 		print_proc(all, "is eating\n", table->eat);
 		unlock_fork(table, philo);
@@ -148,10 +148,6 @@ void *eat(void *alls)
 		print_proc(all, "is thinking\n", 0);
 		philo->must_eat++;
 	}
-
-//	if (philo->id == 1)
-		printf("%d ---------\n", philo->id);
-
 }
 
 void	f_printf(long long int time, unsigned int philo, char *str)
@@ -168,16 +164,16 @@ void print_proc(t_all *alls, char *str, unsigned int time)
 	if (alls->table->stop)
 		return ;
 	alls->philo->cur_time = get_time() - alls->table->start;
-	if(alls->philo->id == 1)
-		write(1, "111111111111\n", 14);
+//	if(alls->philo->id == 1)
+//		write(1, "111111111111\n", 14);
 	pthread_mutex_lock(&alls->table->print);
-	if(alls->philo->id == 1)
-		write(1, "2222222222222\n", 14);
+//	if(alls->philo->id == 1)
+//		write(1, "2222222222222\n", 14);
 	if (alls->table->stop)
 		return ;
 	f_printf(alls->philo->cur_time, alls->philo->id, str);
-	if(alls->philo->id == 1)
-		write(1, "3333333333333\n", 14);
+//	if(alls->philo->id == 1)
+//		write(1, "3333333333333\n", 14);
 	pthread_mutex_unlock(&alls->table->print);
 	if (time)
 		my_usleep(time);

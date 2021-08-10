@@ -1,5 +1,11 @@
 #include "../headers/philo.h"
 
+void	ft_putchar_fd(char c, int fd)
+{
+	if (fd != -1)
+		write(fd, &c, sizeof(char));
+}
+
 void	ft_putnbr_fd(long long int n, int fd)
 {
 	int i;

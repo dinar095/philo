@@ -58,4 +58,5 @@ void				ft_putstr_fd(char *s, int fd);
 u_int64_t 			get_time(void);
 void				print_proc(t_all *alls, char *str, unsigned int time);
 void				ft_putnbr_fd(long long int n, int fd);
+void				ft_putchar_fd(char c, int fd);
 #endif
