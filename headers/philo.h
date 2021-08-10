@@ -40,6 +40,7 @@ typedef struct		s_table
 	unsigned int	sleep;
 	unsigned int 	et_conunt;
 	int 			stop;
+	int 			full;
 	pthread_mutex_t print;
 	u_int64_t 		start;
 
@@ -56,4 +57,5 @@ int					ft_isdigit(int ch);
 void				ft_putstr_fd(char *s, int fd);
 u_int64_t 			get_time(void);
 void				print_proc(t_all *alls, int flag, unsigned int time);
+void				ft_putnbr_fd(long long int n, int fd);
 #endif
