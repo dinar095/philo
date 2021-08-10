@@ -87,10 +87,27 @@ void init_philos(t_table *table, t_philo **philo, t_all **all)
 
 void	lock_fork(t_all *all)
 {
+	if (all->table->stop) {
+		return ;
+	}
+	if(all->philo->id == 1)
+	{
+		ft_putstr_fd("   \n", 1);
+		ft_putnbr_fd(all->philo->left, 1);
+		ft_putstr_fd("   HHHHHHHHHHHHHHHHHH\n", 1);
+	}
 	pthread_mutex_lock(&all->table->forks[all->philo->left]);
-	print_proc(all, 0, 0);
+	if(all->philo->id == 1)
+		printf("\n/////////////////\n");
+	if (all->table->stop)
+		return ;
+	print_proc(all, "has taken a fork\n", 0);
+	if (all->table->stop)
+		return ;
 	pthread_mutex_lock(&all->table->forks[all->philo->right]);
-	print_proc(all, 0, 0);
+	if (all->table->stop)
+		return ;
+	print_proc(all, "has taken a fork\n", 0);
 }
 
 void 	unlock_fork(t_table *table, t_philo *philo)
@@ -115,18 +132,26 @@ void *eat(void *alls)
 	all = (t_all *)alls;
 	table = all->table;
 	philo = all->philo;
-	if (philo->id % 2)
+	if (philo->id % 2) {
 		usleep(80);
+	}
+
 	while (!table->stop)
 	{
 		lock_fork(all);
+		if (philo->id == 1)
+			printf("left %d rigth : %d\n", philo->left, philo->right);
 		philo->die = get_time() + table->die;//update philo die time
-		print_proc(all, 1, table->eat);
+		print_proc(all, "is eating\n", table->eat);
 		unlock_fork(table, philo);
-		print_proc(all, 2, table->sleep);
-		print_proc(all, 3, 0);
+		print_proc(all, "is sleeping\n", table->sleep);
+		print_proc(all, "is thinking\n", 0);
 		philo->must_eat++;
 	}
+
+//	if (philo->id == 1)
+		printf("%d ---------\n", philo->id);
+
 }
 
 void	f_printf(long long int time, unsigned int philo, char *str)
@@ -138,23 +163,24 @@ void	f_printf(long long int time, unsigned int philo, char *str)
 	ft_putstr_fd(str, 1);
 }
 
-void print_proc(t_all *alls, int flag, unsigned int time)
+void print_proc(t_all *alls, char *str, unsigned int time)
 {
-	if (!alls->table->stop)
-	{
-		alls->philo->cur_time = get_time() - alls->table->start;
-		pthread_mutex_lock(&alls->table->print);
-		if (flag == 0)
-			f_printf(alls->philo->cur_time, alls->philo->id, "has taken a fork\n");
-		if (flag == 1)
-			f_printf(alls->philo->cur_time, alls->philo->id, "is eating\n");
-		if (flag == 2)
-			f_printf(alls->philo->cur_time, alls->philo->id, "is sleeping\n");
-		pthread_mutex_unlock(&alls->table->print);
-		if (time)
-			my_usleep(time);
-	}
-
+	if (alls->table->stop)
+		return ;
+	alls->philo->cur_time = get_time() - alls->table->start;
+	if(alls->philo->id == 1)
+		write(1, "111111111111\n", 14);
+	pthread_mutex_lock(&alls->table->print);
+	if(alls->philo->id == 1)
+		write(1, "2222222222222\n", 14);
+	if (alls->table->stop)
+		return ;
+	f_printf(alls->philo->cur_time, alls->philo->id, str);
+	if(alls->philo->id == 1)
+		write(1, "3333333333333\n", 14);
+	pthread_mutex_unlock(&alls->table->print);
+	if (time)
+		my_usleep(time);
 }
 
 void *check_philos(void *alls)
@@ -176,7 +202,7 @@ void *check_philos(void *alls)
 		{
 			philo = all[i].philo;
 			philo->cur_time = curr - table->start;
-			if (curr > philo->die)
+			if (curr >= philo->die)
 			{
 				table->stop = 1;
 				pthread_mutex_lock(&table->print);
@@ -184,17 +210,28 @@ void *check_philos(void *alls)
 				unlock_fork(table, philo);
 				break ;
 			}
-			if (philo->must_eat >= table->et_conunt)
+			if (philo->must_eat >= table->et_conunt) {
 				table->full++;
-			if (table->full == table->philos)
+			}
+			if (table->full == table->philos && !table->stop)
 			{
 				table->stop = 1;
 				pthread_mutex_lock(&table->print);
 				f_printf(philo->cur_time, philo->id, "all philos is eat\n");
 				unlock_fork(table, philo);
+				break ;
 			}
-
 		}
+	}
+	i =-1;
+	my_usleep(500);
+	while (++i < table->philos)
+	{
+		pthread_mutex_unlock(&table->forks[i]);
+//		printf("%d\n", all[i].philo->id);
+//		my_usleep(1000);
+//		ft_putnbr_fd(i, 1);
+//		printf("%d\n", i);
 	}
 }
 
@@ -219,7 +256,11 @@ int main(int argc, char **argv)
 		pthread_create(&threads[i], NULL, eat, &all[i]);
 	i = -1;
 	while (++i < table.philos)
-		pthread_mutex_init(&table.forks[i], NULL);
+	{
+		if ((pthread_mutex_init(&table.forks[i], NULL)))
+			printf("No\n");
+
+	}
 	pthread_create(&killer, NULL, check_philos, all);
 	i = -1;
 	while (++i < table.philos)

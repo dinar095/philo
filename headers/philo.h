@@ -56,6 +56,6 @@ unsigned int		ft_atoi(const char *str);
 int					ft_isdigit(int ch);
 void				ft_putstr_fd(char *s, int fd);
 u_int64_t 			get_time(void);
-void				print_proc(t_all *alls, int flag, unsigned int time);
+void				print_proc(t_all *alls, char *str, unsigned int time);
 void				ft_putnbr_fd(long long int n, int fd);
 #endif
