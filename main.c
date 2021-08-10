@@ -27,6 +27,7 @@ void init_table(t_table *table, char **argv)
 
 	i = -1;
 	table->philos = ft_atoi(argv[1]);
+	//check for - and 0
 	table->die = ft_atoi(argv[2]);
 	table->eat = ft_atoi(argv[3]);
 	table->sleep = ft_atoi(argv[4]);
@@ -73,7 +74,7 @@ void init_philos(t_table *table, t_philo **philo, t_all **all)
 		(*philo)[i].must_eat = 0;
 		(*philo)[i].die = get_time() + table->die;
 	}
-	if (i-- > 1)
+	if (i--)
 		(*philo)[i].left = 0;
 	*all = (t_all *) malloc(sizeof(t_all) * table->philos);
 	i = -1;
@@ -115,7 +116,7 @@ void *eat(void *alls)
 	table = all->table;
 	philo = all->philo;
 	if (philo->id % 2)
-		usleep(100);
+		usleep(80);
 	while (!table->stop)
 	{
 		lock_fork(all);
@@ -139,19 +140,16 @@ void	f_printf(long long int time, unsigned int philo, char *str)
 
 void print_proc(t_all *alls, int flag, unsigned int time)
 {
-	long long curr;
-
-	curr = alls->philo->cur_time;
 	if (!alls->table->stop)
 	{
 		alls->philo->cur_time = get_time() - alls->table->start;
 		pthread_mutex_lock(&alls->table->print);
 		if (flag == 0)
-			f_printf(curr, alls->philo->id, "has taken a fork\n");
+			f_printf(alls->philo->cur_time, alls->philo->id, "has taken a fork\n");
 		if (flag == 1)
-			f_printf(curr, alls->philo->id, "is eating\n");
+			f_printf(alls->philo->cur_time, alls->philo->id, "is eating\n");
 		if (flag == 2)
-			f_printf(curr, alls->philo->id, "is sleeping\n");
+			f_printf(alls->philo->cur_time, alls->philo->id, "is sleeping\n");
 		pthread_mutex_unlock(&alls->table->print);
 		if (time)
 			my_usleep(time);
@@ -180,18 +178,20 @@ void *check_philos(void *alls)
 			philo->cur_time = curr - table->start;
 			if (curr > philo->die)
 			{
+				table->stop = 1;
 				pthread_mutex_lock(&table->print);
 				f_printf(philo->cur_time, philo->id, "is died\n");
-				table->stop = 1;
+				unlock_fork(table, philo);
 				break ;
 			}
 			if (philo->must_eat >= table->et_conunt)
 				table->full++;
 			if (table->full == table->philos)
 			{
+				table->stop = 1;
 				pthread_mutex_lock(&table->print);
 				f_printf(philo->cur_time, philo->id, "all philos is eat\n");
-				table->stop = 1;
+				unlock_fork(table, philo);
 			}
 
 		}
