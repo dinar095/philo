@@ -6,7 +6,7 @@
 /*   By: desausag <desausag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/11 13:56:24 by desausag          #+#    #+#             */
-/*   Updated: 2021/08/11 13:56:24 by desausag         ###   ########.fr       */
+/*   Updated: 2021/08/11 16:16:16 by desausag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ int init_philosophers(t_table *table)
 		phil[i].right = i;
 		phil[i].left = i + 1;
 		phil[i].meals_eated = 0;
-		phil[i].die = get_time() + table->die;
+		phil[i].die = table->start + (long long)table->die;
 		phil[i].table = table;
 	}
 	phil[table->philos - 1].left = 0;

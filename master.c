@@ -23,6 +23,8 @@ void philo_state(t_philo *ph, char *str, unsigned int time)
 {
 	long long curr;
 	curr = get_time() - ph->table->start;
+	if (ph->table->stop)
+		return ;
 	pthread_mutex_lock(&ph->table->print);
 	if (ph->table->stop)
 		return ;
@@ -43,14 +45,14 @@ void my_usleep(unsigned int time)
 
 void	on_off_fork(unsigned int frk1, unsigned int frk2, t_philo *ph, int lock)
 {
-	if (lock)
+	if (lock == 1)
 	{
 		pthread_mutex_lock(&ph->table->forks[frk1]);
-		philo_state(ph, "has taken a fork\n", 0);
+//		philo_state(ph, "has taken a fork\n", 0);
 		pthread_mutex_lock(&ph->table->forks[frk2]);
-		philo_state(ph, "has taken a fork\n", 0);
+//		philo_state(ph, "has taken a fork\n", 0);
 	}
-	else
+	else if (lock == 0)
 	{
 		pthread_mutex_unlock(&ph->table->forks[frk1]);
 		pthread_mutex_unlock(&ph->table->forks[frk2]);
@@ -66,6 +68,7 @@ void *carefree_life(void *arg)
 	philo = (t_philo *)arg;
 	if (philo->id % 2)
 	{
+		my_usleep(50);
 		fork1 = philo->right;
 		fork2 = philo->left;
 	}
@@ -75,43 +78,49 @@ void *carefree_life(void *arg)
 		fork2 = philo->right;
 	}
 
-	while (!(philo->table->stop))
+	while (philo->table->stop == 0)
 	{
 		on_off_fork(fork1, fork2, philo, ON);
 		philo->die = get_time() + philo->table->die;
 		philo_state(philo, "is eating\n", philo->table->eat);
+		philo->meals_eated++;
 		on_off_fork(fork1, fork2, philo, OFF);
+		my_usleep(philo->table->sleep);
 		philo_state(philo, "is sleeping\n", philo->table->sleep);
 		philo_state(philo, "is thinking\n", 0);
-		philo->meals_eated++;
 	}
-	printf("%d was exit\n", philo->id);
 	return (EXIT_SUCCESS);
 }
+void unlock_all(t_table *table, int flag)
+{
+	int i;
 
+	i = -1;
+	while (++i < table->philos && flag)
+	{
+		pthread_mutex_unlock(&table->forks[i]);
+	}
+}
 void *supervisor(void *arg)//TODO:
 {
 	t_table		*table;
-	t_philo	*philo;
+	t_philo		*philo;
 	long long	curr;
 	int 		i;
 
 	table = (t_table *)arg;
-	i = -1;
 	while (!table->stop)
 	{
 		i = -1;
 		table->full = 0;
 		while (++i < table->philos)
 		{
-			philo = table->philosophers;
-			curr = get_time() - table->start;
-			if (curr >= philo->die)
+			philo = &(table->philosophers[i]);
+			if (get_time() >= philo->die)
 			{
 				table->stop = 1;
 				pthread_mutex_lock(&table->print);
-				f_printf(curr, philo->id, "is died\n");
-				my_usleep(100);
+				f_printf(get_time() - table->start, philo->id, "is died\n");
 				break ;
 			}
 			if (philo->meals_eated >= table->must_eat) {
@@ -121,11 +130,12 @@ void *supervisor(void *arg)//TODO:
 			{
 				table->stop = 1;
 				pthread_mutex_lock(&table->print);
-				f_printf(curr, philo->id, "all philos is eat\n");
+				f_printf(get_time() - table->start, philo->id, "all philos is eat\n");
 				break ;
 			}
 		}
 	}
+	unlock_all(table, 1);
 	return (EXIT_SUCCESS);
 }
 
@@ -152,9 +162,13 @@ int stop_simulation(t_table *table)
 	i = -1;
 	while (++i < table->philos)
 	{
-		if (pthread_join(table->philosophers[i].thread, NULL))
+		if (pthread_join(table->philosophers[i].thread, NULL)) {
 			return (EXIT_FAILURE);
+		}
+		printf("%d is exited\n", table->philosophers[i].id);
 	}
+	pthread_join(table->killer, NULL);
+	return (EXIT_SUCCESS);
 }
 //void clear_all(t_table *table);
 int simulation(t_table *table)
