@@ -30,7 +30,7 @@ typedef struct		s_table
 	unsigned int 	die;
 	unsigned int	eat;
 	unsigned int	sleep;
-	int 	must_eat;
+	int 			must_eat;
 	int 			stop;
 	int 			full;
 	pthread_t 		killer;

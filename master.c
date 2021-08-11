@@ -73,11 +73,9 @@ void *carefree_life(void *arg)
 	}
 	else
 	{
-		my_usleep(100);
 		fork1 = philo->left;
 		fork2 = philo->right;
 	}
-
 	while (!philo->table->stop)
 	{
 		on_off_fork(fork1, fork2, philo, ON);
@@ -90,14 +88,16 @@ void *carefree_life(void *arg)
 	}
 	return (EXIT_SUCCESS);
 }
-void unlock_all(t_table *table, int flag)
+void unlock_all(t_table *table)
 {
 	int i;
 
 	i = -1;
-	while (++i < table->philos && flag)
+	while (++i < table->philos )
 	{
+		my_usleep(2);
 		pthread_mutex_unlock(&table->forks[i]);
+		pthread_mutex_unlock(&table->print);
 	}
 }
 void *supervisor(void *arg)//TODO:
@@ -116,22 +116,26 @@ void *supervisor(void *arg)//TODO:
 			philo = &(table->philosophers[i]);
 			if (get_time() > philo->die)
 			{
-				table->stop = 1;
 				pthread_mutex_lock(&table->print);
+				table->stop = 1;
 				f_printf(get_time() - table->start, philo->id, "is died\n");
+				pthread_mutex_unlock(&table->print);
 				break ;
 			}
 			if (philo->meals_eated >= table->must_eat)
 				table->full++;
 			if (table->full == table->philos && !table->stop)
 			{
-				table->stop = 1;
 				pthread_mutex_lock(&table->print);
-				f_printf(get_time() - table->start, philo->id, "all philos is eat\n");
+				table->stop = 1;
+				ft_putnbr_fd(get_time() - table->start, 1);
+				ft_putstr_fd("\tall philos is eat\n", 1);
+				pthread_mutex_unlock(&table->print);
 				break ;
 			}
 		}
 	}
+	unlock_all(table);
 	return (EXIT_SUCCESS);
 }
 
@@ -164,7 +168,11 @@ int stop_simulation(t_table *table)
 	pthread_join(table->killer, NULL);
 	return (EXIT_SUCCESS);
 }
-//void clear_all(t_table *table);
+void clear_all(t_table *table)
+{
+	free(table->forks);
+	free(table->philosophers);
+}
 int simulation(t_table *table)
 {
 	if (run_simulation(table))
@@ -173,7 +181,7 @@ int simulation(t_table *table)
 		return (EXIT_FAILURE);
 	if (pthread_mutex_unlock(&table->print))
 		return (EXIT_FAILURE);
-//	clear_all(table);
+	clear_all(table);
 	return (EXIT_SUCCESS);
 }
 
