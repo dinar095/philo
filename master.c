@@ -87,10 +87,47 @@ void *carefree_life(void *arg)
 	}
 	printf("%d was exit\n", philo->id);
 	return (EXIT_SUCCESS);
-
 }
 
-void *supervisor(void *table);
+void *supervisor(void *arg)//TODO:
+{
+	t_table		*table;
+	t_philo	*philo;
+	long long	curr;
+	int 		i;
+
+	table = (t_table *)arg;
+	i = -1;
+	while (!table->stop)
+	{
+		i = -1;
+		table->full = 0;
+		while (++i < table->philos)
+		{
+			philo = table->philosophers;
+			curr = get_time() - table->start;
+			if (curr >= philo->die)
+			{
+				table->stop = 1;
+				pthread_mutex_lock(&table->print);
+				f_printf(curr, philo->id, "is died\n");
+				my_usleep(100);
+				break ;
+			}
+			if (philo->meals_eated >= table->must_eat) {
+				table->full++;
+			}
+			if (table->full == table->philos && !table->stop)
+			{
+				table->stop = 1;
+				pthread_mutex_lock(&table->print);
+				f_printf(curr, philo->id, "all philos is eat\n");
+				break ;
+			}
+		}
+	}
+	return (EXIT_SUCCESS);
+}
 
 int	run_simulation(t_table *table)
 {
@@ -103,8 +140,8 @@ int	run_simulation(t_table *table)
 		if (pthread_create(&table->philosophers[i].thread, NULL, carefree_life, (void *)(&table->philosophers[i])))
 			return (EXIT_FAILURE);
 	}
-//	if (pthread_create(&table->killer, NULL, supervisor, (void *)table))
-//		return (EXIT_FAILURE);
+	if (pthread_create(&table->killer, NULL, supervisor, (void *)table))
+		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
