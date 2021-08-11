@@ -48,9 +48,9 @@ void	on_off_fork(unsigned int frk1, unsigned int frk2, t_philo *ph, int lock)
 	if (lock == 1)
 	{
 		pthread_mutex_lock(&ph->table->forks[frk1]);
-//		philo_state(ph, "has taken a fork\n", 0);
+		philo_state(ph, "has taken a fork\n", 0);
 		pthread_mutex_lock(&ph->table->forks[frk2]);
-//		philo_state(ph, "has taken a fork\n", 0);
+		philo_state(ph, "has taken a fork\n", 0);
 	}
 	else if (lock == 0)
 	{
@@ -68,7 +68,7 @@ void *carefree_life(void *arg)
 	philo = (t_philo *)arg;
 	if (philo->id % 2)
 	{
-		my_usleep(50);
+		my_usleep(100);
 		fork1 = philo->right;
 		fork2 = philo->left;
 	}
@@ -116,7 +116,7 @@ void *supervisor(void *arg)//TODO:
 		while (++i < table->philos)
 		{
 			philo = &(table->philosophers[i]);
-			if (get_time() >= philo->die)
+			if (get_time() > philo->die)
 			{
 				table->stop = 1;
 				pthread_mutex_lock(&table->print);
@@ -162,10 +162,8 @@ int stop_simulation(t_table *table)
 	i = -1;
 	while (++i < table->philos)
 	{
-		if (pthread_join(table->philosophers[i].thread, NULL)) {
+		if (pthread_join(table->philosophers[i].thread, NULL))
 			return (EXIT_FAILURE);
-		}
-		printf("%d is exited\n", table->philosophers[i].id);
 	}
 	pthread_join(table->killer, NULL);
 	return (EXIT_SUCCESS);
