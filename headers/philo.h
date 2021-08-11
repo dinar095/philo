@@ -41,6 +41,8 @@ typedef struct		s_table
 	unsigned int 	et_conunt;
 	int 			stop;
 	int 			full;
+	int			lock[55];
+	int 		lock_pr;
 	pthread_mutex_t print;
 	u_int64_t 		start;
 

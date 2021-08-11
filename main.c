@@ -93,10 +93,11 @@ void	lock_fork(pthread_mutex_t *fork, t_all *all)
 
 }
 
-void 	unlock_fork(t_table *table, t_philo *philo)
+void 	unlock_fork(pthread_mutex_t *fork)
 {
-	pthread_mutex_unlock(&table->forks[philo->right]);
-	pthread_mutex_unlock(&table->forks[philo->left]);
+	pthread_mutex_unlock(fork);
+//	pthread_mutex_unlock(&table->forks[philo->right]);
+//	pthread_mutex_unlock(&table->forks[philo->left]);
 }
 void my_usleep(unsigned int time)
 {
@@ -127,19 +128,22 @@ void *eat(void *alls)
 		fork1 = philo->left;
 		fork2 = philo->right;
 	}
-//	if (philo->id % 2)
-//		usleep(50);
+	if (philo->id % 2)
+		usleep(50);
 	while (!table->stop)
 	{
-
+		table->lock[philo->id] = 3;
 		lock_fork(&table->forks[fork1], all);
 		lock_fork(&table->forks[fork2], all);
 		philo->die = get_time() + table->die;//update philo die time
 		print_proc(all, "is eating\n", table->eat);
-		unlock_fork(table, philo);
+		unlock_fork(&table->forks[fork1]);
+		table->lock[philo->id] = 2;
+		unlock_fork(&table->forks[fork2]);
 		print_proc(all, "is sleeping\n", table->sleep);
 		print_proc(all, "is thinking\n", 0);
 		philo->must_eat++;
+		table->lock[philo->id] = 0;
 	}
 	printf("%d was exit\n", philo->id);
 }
@@ -158,11 +162,14 @@ void print_proc(t_all *alls, char *str, unsigned int time)
 	if (alls->table->stop)
 		return ;
 	alls->philo->cur_time = get_time() - alls->table->start;
+	alls->table->lock_pr = 1;
 	pthread_mutex_lock(&alls->table->print);
 	if (alls->table->stop)
 		return ;
 	f_printf(alls->philo->cur_time, alls->philo->id, str);
 	pthread_mutex_unlock(&alls->table->print);
+	alls->table->lock_pr = 0;
+	my_usleep(15);
 	if (time)
 		my_usleep(time);
 }
@@ -191,7 +198,9 @@ void *check_philos(void *alls)
 				table->stop = 1;
 				pthread_mutex_lock(&table->print);
 				f_printf(philo->cur_time, philo->id, "is died\n");
-//				unlock_fork(table, philo);
+				my_usleep(100);
+				unlock_fork(&table->forks[philo->left]);
+				unlock_fork(&table->forks[philo->right]);
 				break ;
 			}
 			if (philo->must_eat >= table->et_conunt) {
@@ -207,13 +216,29 @@ void *check_philos(void *alls)
 			}
 		}
 	}
-	usleep(500);
 	i = -1;
-	while(++i < table->philos)
+//	usleep(100000);
+//	while(++i < table->philos)
+//	{
+//		usleep(500);
+//		unlock_fork(&table->forks[i]);
+//		pthread_mutex_unlock(&table->print);
+//	}
+	i = -1;
+	usleep(100000);
+	while (++i < table->philos)
 	{
-		unlock_fork(table, all[i].philo);
-		pthread_mutex_unlock(&table->print);
+		ft_putnbr_fd(i, 2);
+		ft_putstr_fd("\tphilos ", 2);
+		table->forks[i].__data.__count = i;
+		ft_putnbr_fd(table->forks[i].__data.__lock, 2);
+		ft_putstr_fd("\tprint: ", 2);
+		ft_putnbr_fd(table->print.__data.__lock, 2);
+		ft_putstr_fd("\n", 2);
 	}
+	pthread_mutex_unlock(&table->print);
+	pthread_mutex_unlock(&table->print);
+	ft_putnbr_fd(table->print.__data.__lock, 2);
 }
 
 int main(int argc, char **argv)
@@ -224,6 +249,7 @@ int main(int argc, char **argv)
 	pthread_t	*threads;
 	pthread_t 	killer;
 	int 	i;
+	int 	q;
 
 	i = -1;
 	if (argc < 5 || argc > 6)
@@ -244,7 +270,8 @@ int main(int argc, char **argv)
 	pthread_create(&killer, NULL, check_philos, all);
 	i = -1;
 	while (++i < table.philos)
-		pthread_join(threads[i], NULL);
+		q = pthread_join(threads[i], NULL);
+
 	pthread_join(killer, NULL);
 	return 0;
 }
