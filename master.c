@@ -165,7 +165,8 @@ int stop_simulation(t_table *table)
 		if (pthread_join(table->philosophers[i].thread, NULL))
 			return (EXIT_FAILURE);
 	}
-	pthread_join(table->killer, NULL);
+	if (pthread_join(table->killer, NULL))
+		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 void clear_all(t_table *table)
