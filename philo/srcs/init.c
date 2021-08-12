@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parser.c                                           :+:      :+:    :+:   */
+/*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: desausag <desausag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/08/11 13:56:24 by desausag          #+#    #+#             */
-/*   Updated: 2021/08/11 16:16:16 by desausag         ###   ########.fr       */
+/*   Created: 2021/08/12 10:18:44 by desausag          #+#    #+#             */
+/*   Updated: 2021/08/12 10:47:24 by desausag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../headers/philo.h"
+#include "../headers/philo.h"
 
-int check_table(t_table *table)
+int	check_table(t_table *table)
 {
 	if (table->philos < 1 || table->die < 60 || table->sleep < 0)
 		return (EXIT_FAILURE);
@@ -21,7 +21,7 @@ int check_table(t_table *table)
 	return (EXIT_SUCCESS);
 }
 
-int parse_args(char **argv, t_table *table)
+int	parse_args(char **argv, t_table *table)
 {
 	if (!(is_num(argv)))
 		return (EXIT_FAILURE);
@@ -36,14 +36,15 @@ int parse_args(char **argv, t_table *table)
 	return (EXIT_SUCCESS);
 }
 
-int init_table(char **argv, t_table *table)
+int	init_table(char **argv, t_table *table)
 {
-	int i;
+	int	i;
 
 	i = -1;
 	if (parse_args(argv, table))
 		return (EXIT_FAILURE);
-	table->forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * table->philos);
+	table->forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
+			* table->philos);
 	if (!(table->forks))
 		return (EXIT_FAILURE);
 	while (++i < table->philos)
@@ -61,10 +62,10 @@ int init_table(char **argv, t_table *table)
 	return (EXIT_SUCCESS);
 }
 
-int init_philosophers(t_table *table)
+int	init_philosophers(t_table *table)
 {
-	int i;
-	t_philo *phil;
+	int		i;
+	t_philo	*phil;
 
 	i = -1;
 	phil = (t_philo *) malloc(sizeof(t_philo) * table->philos);

@@ -1,14 +1,15 @@
 NAME = philo
 
 CC = gcc
-FUNCTIONS = srcs/ft_atoi \
-			srcs/ft_isdigit \
-			srcs/ft_putnbr_fd	\
-			srcs/ft_putstr_fd	\
+CFLAGS = -Wall -Wextra -Werror
+FUNCTIONS = srcs/breadcrumbs \
+			srcs/carefree_life \
+			srcs/care_free_f \
+			srcs/supervisor \
+			srcs/srcs \
+			srcs/init \
 			main
 HEADER = headers/philo.h
-
-
 
 OBJ = $(patsubst %,%.o,$(FUNCTIONS))
 SRC = $(patsubst %,%.c,$(FUNCTIONS))
@@ -18,7 +19,7 @@ SRC = $(patsubst %,%.c,$(FUNCTIONS))
 all: $(NAME)
 
 obj_f: $(SRC) $(HEADER)
-	$(CC) -c $(SRC)
+	$(CC) CFLAGS = -Wall -Wextra -Werror -c $(SRC)
 
 $(NAME): $(OBJ) $(HEADER)
 	$(CC) $(SRC) -pthread -o $(NAME)
@@ -32,4 +33,7 @@ fclean: clean
 
 re: fclean all
 
-.PHONY:		all clean fclean re
+norm: $(SRC)
+	norminette $(SRC)
+
+.PHONY:		all clean fclean re norm
