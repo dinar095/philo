@@ -5,44 +5,39 @@
 # include <pthread.h>
 # include <stdlib.h>
 # include <sys/time.h>
+# define STOP 1
+# define ON 1
+# define OFF 0
 
 
-
-typedef struct	s_start
-{
-	int num_of_philo;
-	int	time_to_die;
-	int time_to_eat;
-	int time_to_sleep;
-	int must_eat;
-	int num_of_finish_of_filo;
-	int finish;
-	
-}				t_start;
+struct s_table;
 
 typedef struct		s_philo
 {
-	u_int64_t 		eat;
-	u_int64_t 		die;
-	u_int64_t 		cur_time;
+
+	long long 		die;
 	unsigned int 	id;
 	unsigned int	left;
 	unsigned int	right;
-	unsigned int	must_eat;
+	unsigned int	meals_eated;
+	pthread_t 		thread;
+	struct s_table	*table;
 }					t_philo;
 
 typedef struct		s_table
 {
-	pthread_mutex_t	*forks;
 	unsigned int	philos;
 	unsigned int 	die;
 	unsigned int	eat;
 	unsigned int	sleep;
-	unsigned int 	et_conunt;
+	int 			must_eat;
 	int 			stop;
 	int 			full;
+	pthread_t 		killer;
+	pthread_mutex_t	*forks;
 	pthread_mutex_t print;
-	u_int64_t 		start;
+	t_philo			*philosophers;
+	long long 		start;
 
 }					t_table;
 
@@ -55,9 +50,19 @@ typedef struct	s_all
 unsigned int		ft_atoi(const char *str);
 int					ft_isdigit(int ch);
 void				ft_putstr_fd(char *s, int fd);
-u_int64_t 			get_time(void);
-void				print_proc(t_all *alls, char *str, unsigned int time);
+long long 			get_time(void);
+void				philo_state(t_philo *ph, char *str, unsigned int time);
 void				ft_putnbr_fd(long long int n, int fd);
 void				ft_putchar_fd(char c, int fd);
-void				 my_usleep(unsigned int time);
+void				my_usleep(unsigned int time);
+int					is_num(char **argv);
+int					ft_isdigit(int ch);
+int 				str_error(char *str, int ret);
+int					init_philosophers(t_table *table);
+int 				init_table(char **argv, t_table *table);
+
+void *carefree_life(void *table);
+void *supervisor(void *table);
+int stop_simulation();
+void clear_all(t_table *table);
 #endif
